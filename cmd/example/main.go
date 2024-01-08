@@ -10,8 +10,8 @@ func main () {
 	v := validator.New();
 
 	v.AddRule("title",rules.Rule{Type: "required"})
-	v.AddRule("title" , rules.Rule{Type: "max",Param: 2})
-	v.AddRule("body" , rules.Rule{Type: "max",Param: 2})
+	v.AddRule("title" , rules.Rule{Type: "max",Param: 100})
+	v.AddRule("body" , rules.Rule{Type: "max",Param: 100})
 	//v.DebugRules();
 
 	err := v.Validate(map[string]interface{}{
@@ -20,8 +20,12 @@ func main () {
 	})
 
 	if err != nil {
-		fmt.Println(err)
+		for _,singleErr := range err {
+			fmt.Println(singleErr)
+		}
 	}
+
+	fmt.Println("And the life goes on")
 
 
 }
