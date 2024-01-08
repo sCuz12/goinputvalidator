@@ -10,9 +10,10 @@ func main () {
 	v := validator.New();
 
 	v.AddRule("title",rules.Rule{Type: "required"})
-	v.AddRule("title" , rules.Rule{Type: "max",Param: 255})
-	v.DebugRules();
-	
+	v.AddRule("title" , rules.Rule{Type: "max",Param: 2})
+	v.AddRule("body" , rules.Rule{Type: "max",Param: 2})
+	//v.DebugRules();
+
 	err := v.Validate(map[string]interface{}{
 		"title": "asda",
     	"body":  "Some body content",
