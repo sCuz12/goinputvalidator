@@ -23,6 +23,6 @@ To install this package, you can use the `go get ` command:
 
 ```bash
 go get https://github.com/sCuz12/goinputvalidator
-
+```
 
 ## Usage 
