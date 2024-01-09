@@ -4,8 +4,11 @@ package types
 type ValidationTypeRule string
 
 const (
-	Required ValidationTypeRule = "required"
-	Max ValidationTypeRule 		= "max"
-	Min ValidationTypeRule 		= "min"
-	Email ValidationTypeRule 	= "email"
+	Required ValidationTypeRule  = "required"
+	Max ValidationTypeRule 		 = "max"
+	Min ValidationTypeRule 		 = "min"
+	Email ValidationTypeRule 	 = "email"
+	Url ValidationTypeRule	     = "url"
+	ActiveUrl ValidationTypeRule = "active_url"
+	IpFormat ValidationTypeRule  = "ipformat"
 )

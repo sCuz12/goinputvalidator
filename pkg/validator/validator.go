@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"govalidator/pkg/rules"
 	"govalidator/types"
+	"net"
+	"net/http"
+	"net/url"
 	"regexp"
 )
 
@@ -100,13 +103,12 @@ func (v *Validator) Validate(input map[string]interface{}) []error {
 					value , _ := input[field]
 					
 					isEmailValid := isValidEmail(value.(string))
-					
 
+	
 					if(!isEmailValid) {
 						errors = append(errors, NewValidationError(field,fmt.Sprintf("Input field %s must be a valid email format",field)))
 					}
 				}
-
 				case string(types.Min) : {
 					value, _ 	:= input[field]
 					minAssigned := rule.Param.(int)
@@ -118,6 +120,40 @@ func (v *Validator) Validate(input map[string]interface{}) []error {
 						errors = append(errors, NewValidationError(field,fmt.Sprintf("Field %s is less than the minimum length of %d", field, minAssigned)))
 					}
 				}
+
+				case string(types.Url): {
+					value,_ := input[field]
+
+					isUrl := isURL(value.(string))
+
+					if !isUrl {
+						errors = append(errors, NewValidationError(field,fmt.Sprintf("The %s field must be a valid URL.", field)))
+					}
+				}
+
+				case string(types.ActiveUrl) : {
+					value,_ := input[field]
+					
+					isActiveUrl := isActiveUrl(value.(string))
+
+					if !isActiveUrl {
+						errors = append(errors, NewValidationError(field,fmt.Sprintf("The %s field must be active URL.", field)))
+					}
+				}
+
+				case string(types.IpFormat): {
+					value,_ := input[field]
+					
+					isValidIP := isValidIP(value.(string))
+
+					if !isValidIP {
+						errors = append(errors, NewValidationError(field,fmt.Sprintf("The %s field must be valid IP format", field)))
+					}
+
+
+				}
+
+
 			}
 		}
 	}
@@ -134,4 +170,39 @@ func isValidEmail(email string) bool {
 
     // Use the regular expression to match the email
 	return re.MatchString(email)
+}
+
+
+func isURL(givenURL string) bool {
+	_,err := url.ParseRequestURI(givenURL)
+
+
+	if(err != nil) {
+		return false
+	}
+
+	return true
+}
+
+func isActiveUrl(givenURL string) bool {
+	response, err := http.Get(givenURL)
+
+	if err != nil {
+		//no response -> website is not active
+		return false
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode == http.StatusOK {
+		return true
+	}
+
+	return false
+}
+
+func isValidIP(givenIP string) bool {
+	ip := net.ParseIP(givenIP)
+
+	return ip != nil
 }
