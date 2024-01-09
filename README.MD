@@ -26,3 +26,21 @@ go get https://github.com/sCuz12/goinputvalidator
 ```
 
 ## Usage 
+
+```bash
+func main () {
+	v := validator.New();
+
+	v.AddRule("title",rules.Rule{Type: "required"})
+	v.AddRule("title" , rules.Rule{Type: "max",Param: 8})
+	v.AddRule("body" , rules.Rule{Type: "max",Param: 100})
+	v.AddRule("title",rules.Rule{Type: "min" , Param: 3})
+    v.AddRule("email",rules.Rule{Type: "email"})
+
+	err := v.Validate(map[string]interface{}{
+		"title": "Test title",
+    	"body":  "Some body content",
+        "email" : "johndoe@gmail.com",
+	})
+}
+```
