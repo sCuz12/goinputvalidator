@@ -2,32 +2,43 @@ package main
 
 import (
 	"fmt"
-	"govalidator/pkg/rules"
 	"govalidator/pkg/validator"
 )
+type User struct {
+	Title       string `validate:"required|max:10|min:2"`
+	Body        string `validate:"required"`
+	Email       string `validate:"email|required"`
+	Website     string `validate:"url"`
+	WebsiteURL  string `validate:"active_url"`
+	IPAddress   string `validate:"ipformat"`
+}
 
-func main () {
-	v := validator.New();
+func main() {
+	// testValidate()
 
-	// v.AddRule("title",rules.Rule{Type: "required"})
-	// v.AddRule("title" , rules.Rule{Type: "max",Param: 100})
-	// v.AddRule("body" , rules.Rule{Type: "max",Param: 100})
-	// v.DebugRules();return;
-	v.AddRule("title",rules.Rule{Type: "min" , Param: 200})
+	testValidateSchema();
+
+}
 
 
-	err := v.Validate(map[string]interface{}{
-		"title": "morgantest@gmail.com",
-    	"body":  "Some body content",
-	})
+func testValidateSchema() {
+	v := validator.New()
+
+	user := User{
+		Title:  	"John doe",
+		Body:       "Some body content",
+		Email:      "johndoe@gmail.com",
+		Website:    "https://www.google.com",
+		WebsiteURL: "https://georgehadjisavva.dev",
+		IPAddress:  "127.0.0.1.0.0.0",
+	}
+
+	err := v.Validate(user)
 
 	if err != nil {
 		for _,singleErr := range err {
 			fmt.Println(singleErr)
 		}
 	}
-
-	fmt.Println("And the life goes on")
-
 
 }

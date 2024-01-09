@@ -7,7 +7,10 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"reflect"
 	"regexp"
+	"strconv"
+	"strings"
 )
 
 
@@ -57,108 +60,117 @@ func (v *Validator) DebugRules() {
 	}
 } 
 
-func (v *Validator) Validate(input map[string]interface{}) []error {
+
+func (v *Validator) Validate(input interface{})[]error {
 	var errors []error
 
-	//loop through existing Rules 
-	//ex: loop rules of body or title
-	for field , rules := range v.Rules {
-		//ex : title can have multiple validations like required,max etc 
-		for _, rule := range rules {
-			//ex : switch max,required,email
-			switch rule.Type {
-				case string(types.Required) : {
-					value ,ok := input[field] 
+	val := reflect.ValueOf(input)
 
-					if !ok || value == nil || value == "" {
-						//return fmt.Errorf("%s is required", field)
-						errors = append(errors, NewValidationError(field, fmt.Sprintf("Field not found: %s", field)))
-					}
-				}
+	//loop through fiels in struct getter from reflect
+	for i:=0; i < val.NumField(); i++ {
+		field := val.Type().Field(i) // the whole field ex: {Title  string validate:"required|max:1" 0 [0] false}
+		fieldName := field.Name
 
-				case string(types.Max) : {
-					value , ok := input[field]
-					maxAssigned := rule.Param.(int)
+		fieldValue := val.Field(i).Interface()  //whole value of field ex: This is title
+		fieldValueStr := fieldValue.(string) 
+
+
+		//get rules required,email etc
+		rulesTags := field.Tag.Get("validate")
+
+		if rulesTags == "" {
+			//no validation tags
+			continue;
+		}
+
+		rulesArr := strings.Split(rulesTags,"|")
+
+		for _,ruleValue := range rulesArr {
+			rulesPart := strings.Split(ruleValue,":")
+
+			var ruleType string = "" ;
+			var ruleNum  int 	= 0
+
+			if len(rulesPart) > 1 {
+				ruleType = rulesPart[0]
+				ruleNum,_  = strconv.Atoi(rulesPart[1])
+			} else {
+				ruleType = rulesPart[0]
+			}
+	
+			switch ruleType {
+				//max
+				case string(types.Max): {
+					maxAssigned := ruleNum
+
+					valueLen := len(fieldValueStr)
 					
-					if  !ok {
-						//return fmt.Errorf("Not found")
-						errors = append(errors, NewValidationError(field, fmt.Sprintf("Not found")))
-					}
-
-					valueStr, okStr := value.(string) // Assuming the field's value is expected to be a string
-
-					if !okStr {
-						// return fmt.Errorf("Field %s must be a string for max validation", field)
-						errors = append(errors, NewValidationError(field, fmt.Sprintf("Field %s must be a string for max validation", field)))
-					}
-						
-					valueLen := len(valueStr)
-
 					if valueLen > maxAssigned {
 						//return fmt.Errorf("Field %s exceeds the maximum length of %d", field, maxAssigned) 
-						errors = append(errors, NewValidationError(field, fmt.Sprintf("Field %s exceeds the maximum length of %d", field, maxAssigned) ))
+						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field %s exceeds the maximum length of %d", fieldName, maxAssigned) ))
 					}
-				}
-				case string(types.Email) : {
-					value , _ := input[field]
-					
-					isEmailValid := isValidEmail(value.(string))
 
-	
-					if(!isEmailValid) {
-						errors = append(errors, NewValidationError(field,fmt.Sprintf("Input field %s must be a valid email format",field)))
-					}
 				}
+				//min
 				case string(types.Min) : {
-					value, _ 	:= input[field]
-					minAssigned := rule.Param.(int)
+					minAssigned := ruleNum
 
-					valueStr := value.(string)
-					valueLen := len(valueStr)
+					valueLen := len(fieldValueStr)
 
 					if(valueLen < minAssigned) {
-						errors = append(errors, NewValidationError(field,fmt.Sprintf("Field %s is less than the minimum length of %d", field, minAssigned)))
+						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("Field %s is less than the minimum length of %d", fieldName, minAssigned)))
 					}
 				}
+				//required 
+				case string(types.Required) : {
+		
+					if fieldValueStr == "" {
+						//return fmt.Errorf("%s is required", field)
+						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field not found: %s", fieldName)))
+					}
+				}
+				//email 
+				case string(types.Email) : {
+					
+					isEmailValid := isValidEmail(fieldValueStr)
 
+					if(!isEmailValid) {
+						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("Input field %s must be a valid email format",fieldName)))
+					}
+				}
+				//url
 				case string(types.Url): {
-					value,_ := input[field]
 
-					isUrl := isURL(value.(string))
+					isUrl := isURL(fieldValueStr)
 
 					if !isUrl {
-						errors = append(errors, NewValidationError(field,fmt.Sprintf("The %s field must be a valid URL.", field)))
+						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("The %s field must be a valid URL.", fieldName)))
 					}
 				}
-
+				//active URL
 				case string(types.ActiveUrl) : {
-					value,_ := input[field]
 					
-					isActiveUrl := isActiveUrl(value.(string))
+					isActiveUrl := isActiveUrl(fieldValueStr)
 
 					if !isActiveUrl {
-						errors = append(errors, NewValidationError(field,fmt.Sprintf("The %s field must be active URL.", field)))
+						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("The %s field must be active URL.", fieldName)))
 					}
 				}
-
+				//ip
 				case string(types.IpFormat): {
-					value,_ := input[field]
-					
-					isValidIP := isValidIP(value.(string))
+					isValidIP := isValidIP(fieldValueStr)
 
 					if !isValidIP {
-						errors = append(errors, NewValidationError(field,fmt.Sprintf("The %s field must be valid IP format", field)))
+						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("The %s field must be valid IP format", fieldName)))
 					}
-
-
 				}
 
-
 			}
+			
 		}
-	}
 
-	return errors 
+	}
+	return  errors
 }
 
 

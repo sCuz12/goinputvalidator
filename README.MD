@@ -28,19 +28,36 @@ go get https://github.com/sCuz12/goinputvalidator
 ## Usage 
 
 ```bash
-func main () {
-	v := validator.New();
+type User struct {
+	Title       string `validate:"required|max:10|min:2"`
+	Body        string `validate:"required"`
+	Email       string `validate:"email|required"`
+	Website     string `validate:"url"`
+	ActiveURL   string `validate:"active_url"`
+	IPAddress   string `validate:"ipformat"`
+}
+```
 
-	v.AddRule("title",rules.Rule{Type: "required"})
-	v.AddRule("title" , rules.Rule{Type: "max",Param: 8})
-	v.AddRule("body" , rules.Rule{Type: "max",Param: 100})
-	v.AddRule("title",rules.Rule{Type: "min" , Param: 3})
-    v.AddRule("email",rules.Rule{Type: "email"})
 
-	err := v.Validate(map[string]interface{}{
-		"title": "Test title",
-    	"body":  "Some body content",
-        "email" : "johndoe@gmail.com",
-	})
+``` bash 
+func main() {
+	v := validator.New()
+
+	user := User{
+		Title:  "aasda",
+		Body:       "Some body content",
+		Email:      "johndoe@gmail.com",
+		Website:    "https://www.goooogle.com",
+		ActiveURL:  "https://georgehadjisavva.dev",
+		IPAddress:  "127.0.0.1",
+	}
+
+	err := v.Validate(user)
+
+	if err != nil {
+		for _,singleErr := range err {
+			fmt.Println(singleErr)
+		}
+	}
 }
 ```
