@@ -9,13 +9,15 @@ import (
 func main () {
 	v := validator.New();
 
-	v.AddRule("title",rules.Rule{Type: "required"})
-	v.AddRule("title" , rules.Rule{Type: "max",Param: 100})
-	v.AddRule("body" , rules.Rule{Type: "max",Param: 100})
-	//v.DebugRules();
+	// v.AddRule("title",rules.Rule{Type: "required"})
+	// v.AddRule("title" , rules.Rule{Type: "max",Param: 100})
+	// v.AddRule("body" , rules.Rule{Type: "max",Param: 100})
+	// v.DebugRules();return;
+	v.AddRule("title",rules.Rule{Type: "min" , Param: 200})
+
 
 	err := v.Validate(map[string]interface{}{
-		"title": "asda",
+		"title": "morgantest@gmail.com",
     	"body":  "Some body content",
 	})
 
