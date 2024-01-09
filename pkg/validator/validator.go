@@ -68,12 +68,10 @@ func (v *Validator) Validate(input interface{})[]error {
 
 	//loop through fiels in struct getter from reflect
 	for i:=0; i < val.NumField(); i++ {
-		field := val.Type().Field(i) // the whole field ex: {Title  string validate:"required|max:1" 0 [0] false}
-		fieldName := field.Name
-
-		fieldValue := val.Field(i).Interface()  //whole value of field ex: This is title
+		field 	  	  := val.Type().Field(i) // the whole field ex: {Title  string validate:"required|max:1" 0 [0] false}
+		fieldName 	  := field.Name
+		fieldValue 	  := val.Field(i).Interface()  //whole value of field ex: This is title
 		fieldValueStr := fieldValue.(string) 
-
 
 		//get rules required,email etc
 		rulesTags := field.Tag.Get("validate")

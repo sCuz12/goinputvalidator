@@ -5,7 +5,7 @@ import (
 	"govalidator/pkg/validator"
 )
 type User struct {
-	Title       string `validate:"required|max:10|min:2"`
+	Title       string `json:"name" validate:"required|max:10|min:2"`
 	Body        string `validate:"required"`
 	Email       string `validate:"email|required"`
 	Website     string `validate:"url"`
@@ -25,7 +25,7 @@ func testValidateSchema() {
 	v := validator.New()
 
 	user := User{
-		Title:  	"John doe",
+		Title:  	"JohnDoe",
 		Body:       "Some body content",
 		Email:      "johndoe@gmail.com",
 		Website:    "https://www.google.com",
