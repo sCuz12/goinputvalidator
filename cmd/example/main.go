@@ -11,6 +11,7 @@ type User struct {
 	Website     string `validate:"url"`
 	WebsiteURL  string `validate:"active_url"`
 	IPAddress   string `validate:"ipformat"`
+	Birthdate	string `validate:"date"`
 }
 
 func main() {
@@ -30,7 +31,8 @@ func testValidateSchema() {
 		Email:      "johndoe@gmail.com",
 		Website:    "https://www.google.com",
 		WebsiteURL: "https://georgehadjisavva.dev",
-		IPAddress:  "127.0.0.1.0.0.0",
+		IPAddress:  "127.0.0.1",
+		Birthdate:  "07-10-1995",
 	}
 
 	err := v.Validate(user)

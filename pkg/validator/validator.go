@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 
@@ -162,6 +163,16 @@ func (v *Validator) Validate(input interface{})[]error {
 						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("The %s field must be valid IP format", fieldName)))
 					}
 				}
+				//date
+				case string(types.Date) : {
+					
+					isValidDate := isValidDate(fieldValueStr)
+
+					if !isValidDate {
+						errors = append(errors, NewValidationError(fieldName, "Invalid date format"))
+					}
+				}
+				
 
 			}
 			
@@ -215,4 +226,17 @@ func isValidIP(givenIP string) bool {
 	ip := net.ParseIP(givenIP)
 
 	return ip != nil
+}
+
+func isValidDate(givenDate string) bool {	
+
+	dateFormats := []string{"2006-01-02", "02-01-2006", "02/01/2006" , "2006/02/01"}
+	for _,date := range dateFormats {
+		_,err := time.Parse(date,givenDate)
+		if err == nil {
+			return true
+		}
+	}
+
+	return false	
 }
