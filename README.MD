@@ -35,6 +35,7 @@ type User struct {
 	Website     string `validate:"url"`
 	ActiveURL   string `validate:"active_url"`
 	IPAddress   string `validate:"ipformat"`
+	Birthdate	string `validate:"date"`
 }
 ```
 
@@ -50,6 +51,7 @@ func main() {
 		Website:    "https://www.goooogle.com",
 		ActiveURL:  "https://georgehadjisavva.dev",
 		IPAddress:  "127.0.0.1",
+		Birthdate:  "07-10-1995",
 	}
 
 	err := v.Validate(user)
@@ -61,3 +63,37 @@ func main() {
 	}
 }
 ```
+
+---
+
+## Validation Documentation
+
+#### _Supported Date Formats_
+
+The validation package supports multiple date formats for date fields. These formats determine how dates should be formatted when specifying date-related rules in your validation tags. Below are the supported date formats:
+
+1. **ISO 8601 Format (YYYY-MM-DD)**
+   - Format: "2006-01-02"
+   - Example: "2022-12-31"
+
+2. **Day-Month-Year (DD-MM-YYYY)**
+   - Format: "02-01-2006"
+   - Example: "31-12-2022"
+
+3. **Month-Day-Year (MM-DD-YYYY)**
+   - Format: "01-02-2006"
+   - Example: "12-31-2022"
+
+4. **Year-Month-Day (YYYY-MM-DD)**
+   - Format: "2006-01-02"
+   - Example: "2022-12-31"
+
+5. **Alternate Format (YYYY/MM/DD)**
+   - Format: "2006/01/02"
+   - Example: "2022/12/31"
+
+These date formats provide flexibility in how you specify date values in your validation rules. You can use any of these formats when defining date-related rules for your struct fields. The validation package will attempt to parse dates using the specified format(s) and validate them accordingly.
+
+It's important to use the format that matches the date representation you expect in your application. Additionally, when working with date values, ensure consistency in the format you use to avoid unexpected parsing issues.
+
+Please note that the order of day, month, and year components may vary depending on the chosen format. Always use the appropriate format for your specific use case.
