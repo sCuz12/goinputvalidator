@@ -6,15 +6,20 @@
 GoValidator is a robust and versatile Go package designed to simplify and enhance input data validation for your Go applications. It empowers developers to effortlessly validate and sanitize incoming data, ensuring data integrity and security.
 
 **Key Features:** 
-- Easy-to-Use: Streamline the process of validating user inputs, API requests, and form submissions with a user-friendly API.
 
-- Customizable Rules: Define custom validation rules tailored to your application's specific requirements.
+- **Simple and Intuitive Validation:** Easily validate user input by adding validation tags to your struct fields.
 
-- Secure Data: Protect your application from malicious data and ensure data security by filtering and validating inputs.
+- **Support for Common Validation Rules:** The package supports a variety of common validation rules, including:
+  - Required fields
+  - Maximum and minimum lengths for strings
+  - Email format validation
+  - URL format validation
+  - Active URL validation
+  - IP address format validation
+  - Date format validation
 
-- Error Handling: Handle validation errors gracefully with detailed error messages, making it easy to provide meaningful feedback to users.
+- **Customizable Rules:** You can define custom validation rules by adding them to your struct tags.
 
-- Modular and Extensible: Organize your validation logic into separate rules and packages for modularity and code reuse.
 
 
 ## Installation
