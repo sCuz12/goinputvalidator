@@ -14,9 +14,17 @@ import (
 	"time"
 )
 
+var formatMap = map[string]string{
+	"YYYY/MM/DD" : "2006/01/02",
+	"YYYY/DD/MM" : "2006/02/01",
+	"YYYY-MM-DD" : "2006-01-02",
+	"YYYY-DD-MM" : "2006-02-01",
+	
+}
+
 
 type ValidationError struct {
-	Field string 
+	Field   string
 	Message string
 }
 
@@ -26,179 +34,203 @@ type Validator struct {
 	Rules map[string][]rules.Rule
 }
 
-//Returns pointer to Validator Struct
+// Returns pointer to Validator Struct
 func New() *Validator {
 	return &Validator{
 		Rules: make(map[string][]rules.Rule),
 	}
 }
 
-func NewValidationError(field string , message string) *ValidationError {
-	return &ValidationError {
-		Field: field,
+func NewValidationError(field string, message string) *ValidationError {
+	return &ValidationError{
+		Field:   field,
 		Message: message,
 	}
 }
 
 // Error implements the error interface for ValidationError.
 func (ve *ValidationError) Error() string {
-    return fmt.Sprintf("Validation error in field '%s': %s", ve.Field, ve.Message)
+	return fmt.Sprintf("Validation error in field '%s': %s", ve.Field, ve.Message)
 }
 
-func (v *Validator) AddRule(field string , rule rules.Rule) {
+func (v *Validator) AddRule(field string, rule rules.Rule) {
 	v.Rules[field] = append(v.Rules[field], rule)
 }
 
-//Debug -Testing purposes
+// Debug -Testing purposes
 func (v *Validator) DebugRules() {
 	fmt.Println(v.Rules)
-	for field,rules := range v.Rules {
-		fmt.Printf("The field is %v \n",field)
+	for field, rules := range v.Rules {
+		fmt.Printf("The field is %v \n", field)
 
-		for _,rule := range rules {
-			fmt.Printf("Rule type %v and rule param %v \n" ,rule.Type , rule.Param)
+		for _, rule := range rules {
+			fmt.Printf("Rule type %v and rule param %v \n", rule.Type, rule.Param)
 		}
 	}
-} 
+}
 
-
-func (v *Validator) Validate(input interface{})[]error {
+func (v *Validator) Validate(input interface{}) []error {
 	var errors []error
 
 	val := reflect.ValueOf(input)
 
 	//loop through fiels in struct getter from reflect
-	for i:=0; i < val.NumField(); i++ {
-		field 	  	  := val.Type().Field(i) // the whole field ex: {Title  string validate:"required|max:1" 0 [0] false}
-		fieldName 	  := field.Name
-		fieldValue 	  := val.Field(i).Interface()  //whole value of field ex: This is title
-		fieldValueStr := fieldValue.(string) 
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Type().Field(i) // the whole field ex: {Title  string validate:"required|max:1" 0 [0] false}
+		fieldName := field.Name
+		fieldValue := val.Field(i).Interface() //whole value of field ex: This is title
+		fieldValueStr := fieldValue.(string)
 
 		//get rules required,email etc
 		rulesTags := field.Tag.Get("validate")
 
 		if rulesTags == "" {
 			//no validation tags
-			continue;
+			continue
 		}
 
-		rulesArr := strings.Split(rulesTags,"|")
+		rulesArr := strings.Split(rulesTags, "|")
 
-		for _,ruleValue := range rulesArr {
-			rulesPart := strings.Split(ruleValue,":")
+		for _, ruleValue := range rulesArr {
+			rulesParts := strings.Split(ruleValue, ":")
 
-			var ruleType string = "" ;
-			var ruleNum  int 	= 0
+			var ruleType string = ""
+			var ruleNum int = 0
 
-			if len(rulesPart) > 1 {
-				ruleType = rulesPart[0]
-				ruleNum,_  = strconv.Atoi(rulesPart[1])
-			} else {
-				ruleType = rulesPart[0]
-			}
-	
+			ruleType, ruleVal := parseRules(rulesParts) // get rule type and value ex : max , 100  or email , nil
+
 			switch ruleType {
-				//max
-				case string(types.Max): {
-					maxAssigned := ruleNum
+			//max
+				case string(types.Max):
+					{
+						maxAssigned := ruleVal
 
-					valueLen := len(fieldValueStr)
-					
-					if valueLen > maxAssigned {
-						//return fmt.Errorf("Field %s exceeds the maximum length of %d", field, maxAssigned) 
-						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field %s exceeds the maximum length of %d", fieldName, maxAssigned) ))
+						valueLen := len(fieldValueStr)
+
+						if valueLen > maxAssigned.(int) {
+							//return fmt.Errorf("Field %s exceeds the maximum length of %d", field, maxAssigned)
+							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field %s exceeds the maximum length of %d", fieldName, maxAssigned)))
+						}
+
 					}
-
-				}
 				//min
-				case string(types.Min) : {
-					minAssigned := ruleNum
+				case string(types.Min):
+					{
+						minAssigned := ruleNum
 
-					valueLen := len(fieldValueStr)
+						valueLen := len(fieldValueStr)
 
-					if(valueLen < minAssigned) {
-						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("Field %s is less than the minimum length of %d", fieldName, minAssigned)))
+						if valueLen < minAssigned {
+							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field %s is less than the minimum length of %d", fieldName, minAssigned)))
+						}
 					}
-				}
-				//required 
-				case string(types.Required) : {
-		
-					if fieldValueStr == "" {
-						//return fmt.Errorf("%s is required", field)
-						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field not found: %s", fieldName)))
-					}
-				}
-				//email 
-				case string(types.Email) : {
-					
-					isEmailValid := isValidEmail(fieldValueStr)
+				//required
+				case string(types.Required):
+					{
 
-					if(!isEmailValid) {
-						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("Input field %s must be a valid email format",fieldName)))
+						if fieldValueStr == "" {
+							//return fmt.Errorf("%s is required", field)
+							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field not found: %s", fieldName)))
+						}
 					}
-				}
+				//email
+				case string(types.Email):
+					{
+
+						isEmailValid := isValidEmail(fieldValueStr)
+
+						if !isEmailValid {
+							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Input field %s must be a valid email format", fieldName)))
+						}
+					}
 				//url
-				case string(types.Url): {
+				case string(types.Url):
+					{
 
-					isUrl := isURL(fieldValueStr)
+						isUrl := isURL(fieldValueStr)
 
-					if !isUrl {
-						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("The %s field must be a valid URL.", fieldName)))
+						if !isUrl {
+							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("The %s field must be a valid URL.", fieldName)))
+						}
 					}
-				}
 				//active URL
-				case string(types.ActiveUrl) : {
-					
-					isActiveUrl := isActiveUrl(fieldValueStr)
+				case string(types.ActiveUrl):
+					{
 
-					if !isActiveUrl {
-						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("The %s field must be active URL.", fieldName)))
+						isActiveUrl := isActiveUrl(fieldValueStr)
+
+						if !isActiveUrl {
+							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("The %s field must be active URL.", fieldName)))
+						}
 					}
-				}
 				//ip
-				case string(types.IpFormat): {
-					isValidIP := isValidIP(fieldValueStr)
+				case string(types.IpFormat):
+					{
+						isValidIP := isValidIP(fieldValueStr)
 
-					if !isValidIP {
-						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("The %s field must be valid IP format", fieldName)))
+						if !isValidIP {
+							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("The %s field must be valid IP format", fieldName)))
+						}
 					}
-				}
 				//date
-				case string(types.Date) : {
-					
-					isValidDate := isValidDate(fieldValueStr)
+				case string(types.Date):
+					{
 
-					if !isValidDate {
-						errors = append(errors, NewValidationError(fieldName, "Invalid date format"))
+						isValidDate := isValidDate(fieldValueStr)
+
+						if !isValidDate {
+							errors = append(errors, NewValidationError(fieldName, "Invalid date format"))
+						}
 					}
-				}
-				
 
+				case string(types.DateFormat) : 
+					{
+						dateFormat := ruleVal.(string)
+						
+						isValidFormat := isValidDateFormat(fieldValueStr,dateFormat)
+
+						if !isValidFormat {
+							errors = append(errors, NewValidationError( fieldName,fmt.Sprintf( "Invalid date format The required format is %s",dateFormat)))
+						}
+						
+					}
 			}
-			
 		}
 
 	}
-	return  errors
+	return errors
 }
 
+func parseRules(ruleParts []string) (string, interface{}) {
+
+	ruleName := ruleParts[0]
+
+	if len(ruleParts) <= 1 {
+		return ruleName, nil
+	}
+
+	if num, err := strconv.Atoi(ruleParts[1]); err == nil {
+		return ruleName, num
+	} else {
+		// If it's not an integer, treat it as a string
+		return ruleName, ruleParts[1]
+	}
+}
 
 func isValidEmail(email string) bool {
-	emailPattern :=  `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	emailPattern := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 
-  	// Compile the regular expression pattern
+	// Compile the regular expression pattern
 	re := regexp.MustCompile(emailPattern)
 
-    // Use the regular expression to match the email
+	// Use the regular expression to match the email
 	return re.MatchString(email)
 }
 
-
 func isURL(givenURL string) bool {
-	_,err := url.ParseRequestURI(givenURL)
+	_, err := url.ParseRequestURI(givenURL)
 
-
-	if(err != nil) {
+	if err != nil {
 		return false
 	}
 
@@ -228,15 +260,23 @@ func isValidIP(givenIP string) bool {
 	return ip != nil
 }
 
-func isValidDate(givenDate string) bool {	
+func isValidDate(givenDate string) bool {
 
-	dateFormats := []string{"2006-01-02", "02-01-2006", "02/01/2006" , "2006/02/01"}
-	for _,date := range dateFormats {
-		_,err := time.Parse(date,givenDate)
+	dateFormats := []string{"2006-01-02", "02-01-2006", "02/01/2006", "2006/02/01"}
+	for _, date := range dateFormats {
+		_, err := time.Parse(date, givenDate)
 		if err == nil {
 			return true
 		}
 	}
 
-	return false	
+	return false
+}
+
+func isValidDateFormat(givenDate string, dateFormat string ) bool { 
+	fmt.Println(givenDate)
+	fmt.Println(formatMap[dateFormat])
+	_,err := time.Parse(formatMap[dateFormat],givenDate)
+	fmt.Println(err)
+	return err == nil
 }

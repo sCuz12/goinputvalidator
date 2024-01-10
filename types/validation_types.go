@@ -12,4 +12,5 @@ const (
 	ActiveUrl ValidationTypeRule = "active_url"
 	IpFormat ValidationTypeRule  = "ipformat"
 	Date	ValidationTypeRule   = "date"
+	DateFormat ValidationTypeRule = "dateFormat"
 )
