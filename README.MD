@@ -115,12 +115,13 @@ Please note that the order of day, month, and year components may vary depending
 #### **_Supported Date Format_** 
 The following date formats are supported by the validator:
 
+```go 
+Birthdate string `validate:"dateFormat:YYYY/MM/DD"`
+```
+
 - "YYYY/MM/DD" format, mapped to "2006/01/02".
 - "YYYY/DD/MM" format, mapped to "2006/02/01".
 - "YYYY-MM-DD" format, mapped to "2006-01-02".
 - "YYYY-DD-MM" format, mapped to "2006-02-01".
 
-```go 
-Birthdate string `validate:"dateFormat:YYYY/MM/DD"`
-```
 These formats allow you to specify dates in different styles, such as using slashes "/", dashes "-", or various orderings of year, month, and day.
