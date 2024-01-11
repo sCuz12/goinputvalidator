@@ -13,5 +13,6 @@ const (
 	IpFormat ValidationTypeRule   = "ipformat"
 	Date	ValidationTypeRule    = "date"
 	DateFormat ValidationTypeRule = "dateFormat"
-	Between ValidationTypeRule = "between"
+	Between ValidationTypeRule 	  = "between"
+	In ValidationTypeRule		  = "in"
 )

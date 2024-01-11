@@ -190,7 +190,7 @@ func (v *Validator) Validate(input interface{}) []error {
 							errors = append(errors, NewValidationError(fieldName, "Invalid date format"))
 						}
 					}
-
+				//Dateformat
 				case string(types.DateFormat) : 
 					{
 						dateFormat := ruleVal.(string)
@@ -202,7 +202,7 @@ func (v *Validator) Validate(input interface{}) []error {
 						}
 						
 					}
-
+				//Between
 				case string(types.Between) : 
 				{
 					isValidBetween := validateBetween(fieldValueStr.(int), ruleVal.(string))
@@ -212,6 +212,16 @@ func (v *Validator) Validate(input interface{}) []error {
 					}
 
 				}
+				//In
+				case string(types.In) : {
+					allowedValues := strings.Split(ruleVal.(string),",")
+
+					isInputIn := validateIN(fieldValueStr.(string),allowedValues)
+
+					if !isInputIn {
+						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Value '%s' is not allowed. Allowed values are: %s", fieldValueStr, allowedValues)))
+					}
+				}
 			}
 		}
 
@@ -220,6 +230,7 @@ func (v *Validator) Validate(input interface{}) []error {
 }
 
 func parseRules(ruleParts []string) (string, interface{}) {
+	var ruleValue interface{}
 
 	ruleName := ruleParts[0]
 
@@ -228,11 +239,12 @@ func parseRules(ruleParts []string) (string, interface{}) {
 	}
 
 	if num, err := strconv.Atoi(ruleParts[1]); err == nil {
-		return ruleName, num
+		ruleValue = num
 	} else {
 		// If it's not an integer, treat it as a string
-		return ruleName, ruleParts[1]
+		ruleValue = ruleParts[1]
 	}
+	return ruleName,ruleValue
 }
 
 func isValidEmail(email string) bool {
@@ -316,4 +328,14 @@ func validateBetween(givenNumber int, ruleValue string) bool {
 
 	return true
 
+}
+func validateIN(givenString string , allowedValuesSlice []string) bool {
+
+	for _,value := range allowedValuesSlice {
+		if value == givenString {
+			 return true
+		} 
+	}
+
+	return false
 }
