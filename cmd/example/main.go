@@ -14,6 +14,7 @@ type User struct {
 	//Birthdate	string `validate:"date"`
 	// Birthdate	string `validate:"dateFormat:YYYY/MM/DD"`
 	Birthdate	string `validate:"dateFormat:YYYY-MM-DD"`
+	AllowAge	int `validate:"between:1,40"`
 }
 
 func main() {
@@ -35,6 +36,7 @@ func testValidateSchema() {
 		WebsiteURL: "https://georgehadjisavva.dev",
 		IPAddress:  "127.0.0.1",
 		Birthdate:  "2022-02-15",
+		AllowAge:	300,
 	}
 
 	err := v.Validate(user)

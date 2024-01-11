@@ -14,12 +14,12 @@ import (
 	"time"
 )
 
+/*Allowed Date Format*/
 var formatMap = map[string]string{
 	"YYYY/MM/DD" : "2006/01/02",
 	"YYYY/DD/MM" : "2006/02/01",
 	"YYYY-MM-DD" : "2006-01-02",
 	"YYYY-DD-MM" : "2006-02-01",
-	
 }
 
 
@@ -73,14 +73,22 @@ func (v *Validator) Validate(input interface{}) []error {
 	var errors []error
 
 	val := reflect.ValueOf(input)
-
+	
 	//loop through fiels in struct getter from reflect
 	for i := 0; i < val.NumField(); i++ {
 		field := val.Type().Field(i) // the whole field ex: {Title  string validate:"required|max:1" 0 [0] false}
 		fieldName := field.Name
 		fieldValue := val.Field(i).Interface() //whole value of field ex: This is title
-		fieldValueStr := fieldValue.(string)
+		
+		var fieldValueStr interface{} 
 
+		switch fieldValue.(type) {
+			case int:
+				fieldValueStr = fieldValue
+			default:
+				fieldValueStr = fieldValue.(string)
+		}
+		
 		//get rules required,email etc
 		rulesTags := field.Tag.Get("validate")
 
@@ -96,7 +104,7 @@ func (v *Validator) Validate(input interface{}) []error {
 
 			var ruleType string = ""
 			var ruleNum int = 0
-
+		
 			ruleType, ruleVal := parseRules(rulesParts) // get rule type and value ex : max , 100  or email , nil
 
 			switch ruleType {
@@ -105,7 +113,7 @@ func (v *Validator) Validate(input interface{}) []error {
 					{
 						maxAssigned := ruleVal
 
-						valueLen := len(fieldValueStr)
+						valueLen := len(fieldValueStr.(string))
 
 						if valueLen > maxAssigned.(int) {
 							//return fmt.Errorf("Field %s exceeds the maximum length of %d", field, maxAssigned)
@@ -118,7 +126,7 @@ func (v *Validator) Validate(input interface{}) []error {
 					{
 						minAssigned := ruleNum
 
-						valueLen := len(fieldValueStr)
+						valueLen := len(fieldValueStr.(string))
 
 						if valueLen < minAssigned {
 							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field %s is less than the minimum length of %d", fieldName, minAssigned)))
@@ -128,7 +136,7 @@ func (v *Validator) Validate(input interface{}) []error {
 				case string(types.Required):
 					{
 
-						if fieldValueStr == "" {
+						if fieldValueStr.(string) == "" {
 							//return fmt.Errorf("%s is required", field)
 							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field not found: %s", fieldName)))
 						}
@@ -137,7 +145,7 @@ func (v *Validator) Validate(input interface{}) []error {
 				case string(types.Email):
 					{
 
-						isEmailValid := isValidEmail(fieldValueStr)
+						isEmailValid := isValidEmail(fieldValueStr.(string))
 
 						if !isEmailValid {
 							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Input field %s must be a valid email format", fieldName)))
@@ -147,7 +155,7 @@ func (v *Validator) Validate(input interface{}) []error {
 				case string(types.Url):
 					{
 
-						isUrl := isURL(fieldValueStr)
+						isUrl := isURL(fieldValueStr.(string))
 
 						if !isUrl {
 							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("The %s field must be a valid URL.", fieldName)))
@@ -157,7 +165,7 @@ func (v *Validator) Validate(input interface{}) []error {
 				case string(types.ActiveUrl):
 					{
 
-						isActiveUrl := isActiveUrl(fieldValueStr)
+						isActiveUrl := isActiveUrl(fieldValueStr.(string))
 
 						if !isActiveUrl {
 							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("The %s field must be active URL.", fieldName)))
@@ -166,7 +174,7 @@ func (v *Validator) Validate(input interface{}) []error {
 				//ip
 				case string(types.IpFormat):
 					{
-						isValidIP := isValidIP(fieldValueStr)
+						isValidIP := isValidIP(fieldValueStr.(string))
 
 						if !isValidIP {
 							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("The %s field must be valid IP format", fieldName)))
@@ -176,7 +184,7 @@ func (v *Validator) Validate(input interface{}) []error {
 				case string(types.Date):
 					{
 
-						isValidDate := isValidDate(fieldValueStr)
+						isValidDate := isValidDate(fieldValueStr.(string))
 
 						if !isValidDate {
 							errors = append(errors, NewValidationError(fieldName, "Invalid date format"))
@@ -187,13 +195,23 @@ func (v *Validator) Validate(input interface{}) []error {
 					{
 						dateFormat := ruleVal.(string)
 						
-						isValidFormat := isValidDateFormat(fieldValueStr,dateFormat)
+						isValidFormat := isValidDateFormat(fieldValueStr.(string),dateFormat)
 
 						if !isValidFormat {
 							errors = append(errors, NewValidationError( fieldName,fmt.Sprintf( "Invalid date format The required format is %s",dateFormat)))
 						}
 						
 					}
+
+				case string(types.Between) : 
+				{
+					isValidBetween := validateBetween(fieldValueStr.(int), ruleVal.(string))
+
+					if !isValidBetween {
+						errors = append(errors, NewValidationError( fieldName,fmt.Sprintf( "Number out of range , the number should be between %s ",ruleValue)))
+					}
+
+				}
 			}
 		}
 
@@ -274,9 +292,28 @@ func isValidDate(givenDate string) bool {
 }
 
 func isValidDateFormat(givenDate string, dateFormat string ) bool { 
-	fmt.Println(givenDate)
-	fmt.Println(formatMap[dateFormat])
 	_,err := time.Parse(formatMap[dateFormat],givenDate)
-	fmt.Println(err)
 	return err == nil
+}
+
+func validateBetween(givenNumber int, ruleValue string) bool {
+
+	parts := strings.Split(ruleValue,",")
+
+	floorNumber, err := strconv.Atoi(parts[0])
+    if err != nil {
+        return false
+    }
+
+    ceilingNumber, err := strconv.Atoi(parts[1])
+    if err != nil {
+        return false
+    }
+	
+	if givenNumber > ceilingNumber || givenNumber < floorNumber {
+		return false
+	}
+
+	return true
+
 }
