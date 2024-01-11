@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/yourusername/yourpackage)](https://goreportcard.com/report/github.com/yourusername/yourpackage)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-GoValidator is a robust and versatile Go package designed to simplify and enhance input data validation for your Go applications. It empowers developers to effortlessly validate and sanitize incoming data, ensuring data integrity and security.
+GoValidator is a robust and versatile Go package that streamlines the process of validating data through struct information. Designed to simplify and enhance input data validation for your Go applications, GoValidator empowers developers to effortlessly validate data
 
 **Key Features:** 
 
@@ -17,10 +17,8 @@ GoValidator is a robust and versatile Go package designed to simplify and enhanc
   - Active URL validation
   - IP address format validation
   - Date format validation
-
-- **Customizable Rules:** You can define custom validation rules by adding them to your struct tags.
-
-
+  - Between validation 
+  - In validation 
 
 ## Installation
 
@@ -41,6 +39,8 @@ type User struct {
 	ActiveURL   string `validate:"active_url"`
 	IPAddress   string `validate:"ipformat"`
 	Birthdate	string `validate:"date"`
+	AllowAge	int    `validate:"between:1,40"`
+	UserType 	string `validate:"in:driver,client,admin"`,
 }
 ```
 
@@ -50,13 +50,16 @@ func main() {
 	v := validator.New()
 
 	user := User{
-		Title:  "aasda",
+		Title:  	"This is a test",
 		Body:       "Some body content",
 		Email:      "johndoe@gmail.com",
 		Website:    "https://www.goooogle.com",
 		ActiveURL:  "https://georgehadjisavva.dev",
 		IPAddress:  "127.0.0.1",
 		Birthdate:  "07-10-1995",
+		AllowAge:	12,
+		UserType: 	"client",
+
 	}
 
 	err := v.Validate(user)
@@ -73,55 +76,52 @@ func main() {
 
 ## Validation Documentation
 
-#### **_Supported Dates_**
+1. **Required**
+   - **Rule Format:** `required`
+   - **Example:** `validate:"required|max:20|min:2"`
+   - **Description:** Validates that the field is required and has a maximum length of 20 characters, with a minimum length of 2 characters.
 
-```go 
-Birthdate	string `validate:"date"`
-```
+2. **Email**
+   - **Rule Format:** `email`
+   - **Example:** `validate:"email"`
+   - **Description:** Validates that the email is in a valid format 
 
-The validation package supports multiple date formats for date fields. These formats determine how dates should be formatted when specifying date-related rules in your validation tags. Below are the supported date formats: *
+3. **Website**
+    - **Rule Format:** `url`
+    - **Example:** `validate:"url"`
+    - **Description:** Validates that the website is a valid URL.
 
-1. **ISO 8601 Format (YYYY-MM-DD)**
-   - Format: "2006-01-02"
-   - Example: "2022-12-31"
-   - validate:date:YYYY-MM-DD
+4. **Active Website**
+    - **Rule Format:** `active_url`
+    - **Example:** `validate:"active_url"`
+    - **Description:** Validates that the website URL is active(accessible).
 
-2. **Day-Month-Year (DD-MM-YYYY)**
-   - Format: "02-01-2006"
-   - Example: "31-12-2022"
-   - validate:date: DD-MM-YYYY
+5. **Ip Format**
+    - **Rule Format:** `ipformat`
+    - **Example:** `validate:"ipformat"`
+    - **Description:** Validates that the IP address is in a valid format.
 
-3. **Month-Day-Year (MM-DD-YYYY)**
-   - Format: "01-02-2006"
-   - Example: "12-31-2022"
-   - validate:date:MM-DD-YYYY
+6. **Date**
+    - **Rule Format:** `date`
+    - **Example:** `validate:"date"`
+    - **Description:** Validates that the birthdate is in the allowed date formats
+    - **Notes:** Acceptable formats 
+      - "YYYY/MM/DD" format, mapped to "2006/01/02".
+      - "YYYY/DD/MM" format, mapped to "2006/02/01".
+      - "YYYY-MM-DD" format, mapped to "2006-01-02".
+      - "YYYY-DD-MM" format, mapped to "2006-02-01".
 
-4. **Year-Month-Day (YYYY-MM-DD)**
-   - Format: "2006-01-02"
-   - Example: "2022-12-31"
-   - validate:date:YYYY-MM-DD
+7. **Date Format - Specify Format**
+    - **Rule Format:** `dateFormat:YYYY-MM-DD`
+    - **Example:** `validate:"dateFormat:YYYY-MM-DD"`
+    - **Description:** Validates that the birthdate is in the format specified "YYYY-MM-DD".
 
-5. **Alternate Format (YYYY/MM/DD)**
-   - Format: "2006/01/02"
-   - Example: "2022/12/31"
-   - validate:date:YYYY/MM/DD
+8. **Between**
+   - **Rule Format:** `between:floor,ceiling`
+   - **Example:** `validate:"between:1,40"`
+   - **Description:** Validates that the input value is between the specified floor and ceiling values (inclusive).
 
-These date formats provide flexibility in how you specify date values in your validation rules. You can use any of these formats when defining date-related rules for your struct fields. The validation package will attempt to parse dates using the specified format(s) and validate them accordingly.
-
-It's important to use the format that matches the date representation you expect in your application. Additionally, when working with date values, ensure consistency in the format you use to avoid unexpected parsing issues.
-
-Please note that the order of day, month, and year components may vary depending on the chosen format. Always use the appropriate format for your specific use case.
-
-#### **_Supported Date Format_** 
-The following date formats are supported by the validator:
-
-```go 
-Birthdate string `validate:"dateFormat:YYYY/MM/DD"`
-```
-
-- "YYYY/MM/DD" format, mapped to "2006/01/02".
-- "YYYY/DD/MM" format, mapped to "2006/02/01".
-- "YYYY-MM-DD" format, mapped to "2006-01-02".
-- "YYYY-DD-MM" format, mapped to "2006-02-01".
-
-These formats allow you to specify dates in different styles, such as using slashes "/", dashes "-", or various orderings of year, month, and day.
+9. **In**
+   - **Rule Format:** `in:value1,value2,...,valueN`
+   - **Example:** `validate:"in:driver,client,admin"`
+   - **Description:** Validates that the input value is one of the specified allowed values.
