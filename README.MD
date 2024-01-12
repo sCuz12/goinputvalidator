@@ -32,16 +32,17 @@ go get https://github.com/sCuz12/goinputvalidator
 
 ```bash
 type User struct {
-	Title       string `validate:"required|max:10|min:2"`
-	Body        string `validate:"required"`
-	Email       string `validate:"email|required"`
-	Website     string `validate:"url"`
-	ActiveURL   string `validate:"active_url"`
-	IPAddress   string `validate:"ipformat"`
-	Birthdate	string `validate:"date"`
-	AllowAge	int    `validate:"between:1,40"`
-	UserType 	string `validate:"in:driver,client,admin"`,
-	SendEmails 	interface{} `validate:"accepted"`
+	Title        string `validate:"required|max:10|min:2"`
+	Body         string `validate:"required"`
+	Email        string `validate:"email|required"`
+	Website      string `validate:"url"`
+	ActiveURL    string `validate:"active_url"`
+	IPAddress    string `validate:"ipformat"`
+	Birthdate	 string `validate:"date"`
+	AllowAge	 int    `validate:"between:1,40"`
+	UserType 	 string `validate:"in:driver,client,admin"`,
+	Subscription string`validate:"notIn:free,freebie"`
+	SendEmails 	 interface{} `validate:"accepted"`
 }
 ```
 
@@ -60,8 +61,8 @@ func main() {
 		Birthdate:  "07-10-1995",
 		AllowAge:	12,
 		UserType: 	"client",
+		Subscription : "free",
 		SendEmails: 1,
-
 	}
 
 	err := v.Validate(user)
@@ -132,3 +133,7 @@ func main() {
    - **Rule Format:** `accepted`
    - **Example:** `validate:"accepted"`
    - **Description:** Validates if the input value is one of the accepted values: "yes", "on", 1, or true.
+11. **NotIn**
+   - **Rule Format:** `notin`
+   - **Example:** `validate:"notIn:free,freebie"`
+   - **Description:** The NotIn validator ensures that the input value is not one of the specified disallowed values.
