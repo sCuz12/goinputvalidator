@@ -2,8 +2,6 @@ package validator
 
 import (
 	"fmt"
-	"goinputvalidator/pkg/rules"
-	"goinputvalidator/types"
 	"net"
 	"net/http"
 	"net/url"
@@ -12,6 +10,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/sCuz12/goinputvalidator/pkg/rules"
+	"github.com/sCuz12/goinputvalidator/types"
 )
 
 /*Allowed Date Format*/
