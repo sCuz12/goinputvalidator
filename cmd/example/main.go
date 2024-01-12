@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"govalidator/pkg/validator"
+	"goinputvalidator/pkg/validator"
 )
 type User struct {
 	Title       string `json:"name" validate:"required|max:20|min:2"`

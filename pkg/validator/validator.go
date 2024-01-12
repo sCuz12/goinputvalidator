@@ -2,8 +2,8 @@ package validator
 
 import (
 	"fmt"
-	"govalidator/pkg/rules"
-	"govalidator/types"
+	"goinputvalidator/pkg/rules"
+	"goinputvalidator/types"
 	"net"
 	"net/http"
 	"net/url"
