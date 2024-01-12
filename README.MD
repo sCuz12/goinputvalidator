@@ -41,6 +41,7 @@ type User struct {
 	Birthdate	string `validate:"date"`
 	AllowAge	int    `validate:"between:1,40"`
 	UserType 	string `validate:"in:driver,client,admin"`,
+	SendEmails 	interface{} `validate:"accepted"`
 }
 ```
 
@@ -59,6 +60,7 @@ func main() {
 		Birthdate:  "07-10-1995",
 		AllowAge:	12,
 		UserType: 	"client",
+		SendEmails: 1,
 
 	}
 
@@ -125,3 +127,8 @@ func main() {
    - **Rule Format:** `in:value1,value2,...,valueN`
    - **Example:** `validate:"in:driver,client,admin"`
    - **Description:** Validates that the input value is one of the specified allowed values.
+
+10. **Accepted**
+   - **Rule Format:** `accepted`
+   - **Example:** `validate:"accepted"`
+   - **Description:** Validates if the input value is one of the accepted values: "yes", "on", 1, or true.

@@ -15,4 +15,5 @@ const (
 	DateFormat ValidationTypeRule = "dateFormat"
 	Between ValidationTypeRule 	  = "between"
 	In ValidationTypeRule		  = "in"
+	Accepted ValidationTypeRule   = "accepted"
 )

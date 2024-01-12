@@ -85,6 +85,8 @@ func (v *Validator) Validate(input interface{}) []error {
 		switch fieldValue.(type) {
 			case int:
 				fieldValueStr = fieldValue
+			case bool :
+				fieldValueStr = fieldValue
 			default:
 				fieldValueStr = fieldValue.(string)
 		}
@@ -206,7 +208,6 @@ func (v *Validator) Validate(input interface{}) []error {
 				case string(types.Between) : 
 				{
 					isValidBetween := validateBetween(fieldValueStr.(int), ruleVal.(string))
-
 					if !isValidBetween {
 						errors = append(errors, NewValidationError( fieldName,fmt.Sprintf( "Number out of range , the number should be between %s ",ruleValue)))
 					}
@@ -222,6 +223,17 @@ func (v *Validator) Validate(input interface{}) []error {
 						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Value '%s' is not allowed. Allowed values are: %s", fieldValueStr, allowedValues)))
 					}
 				}
+				//Accepted
+			case  string(types.Accepted) : {
+				supportedValues := []interface{} {"yes", "on",1,true}
+
+				isAcceptedValue := validateAccepted(fieldValueStr,supportedValues)
+
+				if !isAcceptedValue {
+					errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Value '%v' is not allowed. Allowed values are: %v", fieldValueStr, supportedValues)))
+				}
+				
+			}
 			}
 		}
 
@@ -338,4 +350,15 @@ func validateIN(givenString string , allowedValuesSlice []string) bool {
 	}
 
 	return false
+}
+
+func validateAccepted(givenInput interface{}, supportedValues []interface{}) bool {
+
+	for _ , val := range supportedValues {
+		if val == givenInput {
+			return true
+		} 
+	}
+	return false
+
 }

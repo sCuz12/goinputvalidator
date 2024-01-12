@@ -16,6 +16,8 @@ type User struct {
 	Birthdate	string `validate:"dateFormat:YYYY-MM-DD"`
 	AllowAge	int `validate:"between:1,40"`
 	UserType 	string `validate:"in:driver,client,admin"`
+	SendEmails 	interface{} `validate:"accepted"`
+
 }
 
 func main() {
@@ -39,6 +41,7 @@ func testValidateSchema() {
 		Birthdate:  "2022-02-15",
 		AllowAge:	12,
 		UserType: "client",
+		SendEmails: 1,
 	}
 
 	err := v.Validate(user)
