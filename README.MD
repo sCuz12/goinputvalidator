@@ -25,7 +25,7 @@ GoValidator is a robust and versatile Go package that streamlines the process of
 To install this package, you can use the `go get ` command:
 
 ```bash
-go get https://github.com/sCuz12/goinputvalidator
+go get github.com/sCuz12/goinputvalidator
 ```
 
 ## Usage 
