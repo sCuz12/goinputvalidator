@@ -43,6 +43,7 @@ type User struct {
 	UserType 	 string `validate:"in:driver,client,admin"`,
 	Subscription string`validate:"notIn:free,freebie"`
 	SendEmails 	 interface{} `validate:"accepted"`
+   Fields		[]string `validate:"size:2"`
 }
 ```
 
@@ -63,6 +64,7 @@ func main() {
 		UserType: 	"client",
 		Subscription : "free",
 		SendEmails: 1,
+      Fields: []string{"field1", "field2"},
 	}
 
 	err := v.Validate(user)
@@ -137,3 +139,10 @@ func main() {
    - **Rule Format:** `notin`
    - **Example:** `validate:"notIn:free,freebie"`
    - **Description:** The NotIn validator ensures that the input value is not one of the specified disallowed values.
+12. **Size**
+   - **Rule Format:** `size:N`
+   - **Example:** `validate:"size:8"`
+   - **Description:** Validates that the input data has a specific size. The behavior of this rule varies depending on the data type: 
+ 
+                        - For strings, "N" corresponds to the number of characters in the string.
+                        - For arrays or slices, "N" corresponds to the number of elements in the array or slice.

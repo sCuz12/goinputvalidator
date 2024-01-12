@@ -18,7 +18,7 @@ type User struct {
 	UserType 	string `validate:"in:driver,client,admin"`
 	SendEmails 	interface{} `validate:"accepted"`
 	Subscription string `validate:"notIn:free,freebie"`
-
+	Fields		[]string `validate:"size:2"`
 }
 
 func main() {
@@ -43,7 +43,8 @@ func testValidateSchema() {
 		AllowAge:	12,
 		UserType: "client",
 		SendEmails: 1,
-		Subscription : "free",
+		Subscription : "asda",
+		Fields: []string{"field1", "field2"},
 	}
 
 	err := v.Validate(user)

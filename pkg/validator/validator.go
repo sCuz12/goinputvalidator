@@ -81,11 +81,13 @@ func (v *Validator) Validate(input interface{}) []error {
 		fieldValue := val.Field(i).Interface() //whole value of field ex: This is title
 		
 		var fieldValueStr interface{} 
-
+		
 		switch fieldValue.(type) {
 			case int:
 				fieldValueStr = fieldValue
 			case bool :
+				fieldValueStr = fieldValue
+			case []string : 
 				fieldValueStr = fieldValue
 			default:
 				fieldValueStr = fieldValue.(string)
@@ -244,6 +246,14 @@ func (v *Validator) Validate(input interface{}) []error {
 						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Value '%s' is not allowed. Must not be one of: %s", fieldValueStr, notAllowedValues)))
 					}
 				}
+				//Size 
+				case string(types.Size) : {
+					isCorrectSize := validateSize(fieldValueStr,ruleVal.(int))
+					
+					if !isCorrectSize {
+						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field '%s' should have exactly %d elements", fieldName, ruleVal.(int))))
+					}
+				}
 			}
 		}
 
@@ -371,4 +381,19 @@ func validateAccepted(givenInput interface{}, supportedValues []interface{}) boo
 	}
 	return false
 
+}
+
+func validateSize (givenInput interface{},allowedSize int) bool {
+	switch v := givenInput.(type) {
+	case string :
+		return len(v) == allowedSize
+	case []int : 
+		return len(v) == allowedSize
+
+	case []string : 
+		return len(v) == allowedSize
+	default:
+		return false
+
+	}
 }

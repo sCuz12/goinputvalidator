@@ -17,4 +17,5 @@ const (
 	In ValidationTypeRule		  = "in"
 	Accepted ValidationTypeRule   = "accepted"
 	NotIn	ValidationTypeRule	  = "notIn"
+	Size ValidationTypeRule 	  = "size"
 )
