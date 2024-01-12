@@ -17,6 +17,7 @@ type User struct {
 	AllowAge	int `validate:"between:1,40"`
 	UserType 	string `validate:"in:driver,client,admin"`
 	SendEmails 	interface{} `validate:"accepted"`
+	Subscription string `validate:"notIn:free,freebie"`
 
 }
 
@@ -42,6 +43,7 @@ func testValidateSchema() {
 		AllowAge:	12,
 		UserType: "client",
 		SendEmails: 1,
+		Subscription : "free",
 	}
 
 	err := v.Validate(user)

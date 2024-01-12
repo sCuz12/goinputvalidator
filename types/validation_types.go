@@ -16,4 +16,5 @@ const (
 	Between ValidationTypeRule 	  = "between"
 	In ValidationTypeRule		  = "in"
 	Accepted ValidationTypeRule   = "accepted"
+	NotIn	ValidationTypeRule	  = "notIn"
 )

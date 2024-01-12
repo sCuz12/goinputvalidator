@@ -224,16 +224,26 @@ func (v *Validator) Validate(input interface{}) []error {
 					}
 				}
 				//Accepted
-			case  string(types.Accepted) : {
-				supportedValues := []interface{} {"yes", "on",1,true}
+				case  string(types.Accepted) : {
+					supportedValues := []interface{} {"yes", "on",1,true}
 
-				isAcceptedValue := validateAccepted(fieldValueStr,supportedValues)
+					isAcceptedValue := validateAccepted(fieldValueStr,supportedValues)
 
-				if !isAcceptedValue {
-					errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Value '%v' is not allowed. Allowed values are: %v", fieldValueStr, supportedValues)))
+					if !isAcceptedValue {
+						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Value '%v' is not allowed. Allowed values are: %v", fieldValueStr, supportedValues)))
+					}
+					
 				}
-				
-			}
+				//Not in 
+				case string(types.NotIn) : {
+					notAllowedValues := strings.Split(ruleVal.(string),",")
+
+					isNotIn := validateIN(fieldValueStr.(string),notAllowedValues)
+					
+					if(isNotIn) {
+						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Value '%s' is not allowed. Must not be one of: %s", fieldValueStr, notAllowedValues)))
+					}
+				}
 			}
 		}
 
