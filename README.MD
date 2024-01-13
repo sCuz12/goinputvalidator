@@ -44,6 +44,8 @@ type User struct {
 	Subscription string`validate:"notIn:free,freebie"`
 	SendEmails 	 interface{} `validate:"accepted"`
    Fields		[]string `validate:"size:2"`
+   Confirmation_password string 
+	Password 	string `validate:"confirmed"`
 }
 ```
 
@@ -65,6 +67,8 @@ func main() {
 		Subscription : "free",
 		SendEmails: 1,
       Fields: []string{"field1", "field2"},
+      Confirmation_password : "password",
+	   Password: 	"password1", 
 	}
 
 	err := v.Validate(user)
@@ -146,3 +150,7 @@ func main() {
  
                         - For strings, "N" corresponds to the number of characters in the string.
                         - For arrays or slices, "N" corresponds to the number of elements in the array or slice.
+13. **Confirmed**
+   - **Rule Format:**  `confirmed`
+   - **Example:**  `validate:confirmed`
+   - **Description:**  Validates that a field matches its **Confirmation_password** counterpart. For example, it ensures that a **Password** field matches the **Confirmation_password** field to confirm that the user entered the correct password. This rule is  used for password confirmation fields in registration or password reset forms.

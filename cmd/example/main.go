@@ -20,6 +20,8 @@ type User struct {
 	SendEmails 	interface{} `validate:"accepted"`
 	Subscription string `validate:"notIn:free,freebie"`
 	Fields		[]string `validate:"size:2"`
+	Confirmation_password string 
+	Password 	string `validate:"confirmed"`
 }
 
 func main() {
@@ -46,6 +48,8 @@ func testValidateSchema() {
 		SendEmails: 1,
 		Subscription : "paid",
 		Fields: []string{"field1", "field2"},
+		Confirmation_password : "okok1",
+		Password: 	"okok",
 	}
 
 	err := v.Validate(user)

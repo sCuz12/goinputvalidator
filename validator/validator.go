@@ -35,6 +35,11 @@ type Validator struct {
 	Rules map[string][]rules.Rule
 }
 
+type ConfirmPasswordInfo struct {
+	Exist bool
+	Value string
+}
+
 // Returns pointer to Validator Struct
 func New() *Validator {
 	return &Validator{
@@ -73,7 +78,14 @@ func (v *Validator) DebugRules() {
 func (v *Validator) Validate(input interface{}) []error {
 	var errors []error
 
+	done := make(chan ConfirmPasswordInfo)
+
 	val := reflect.ValueOf(input)
+
+	go checkConfirmationPasswordExists(&val,done)
+
+	confirmationPasswordInfo := <-done
+
 	
 	//loop through fiels in struct getter from reflect
 	for i := 0; i < val.NumField(); i++ {
@@ -102,7 +114,7 @@ func (v *Validator) Validate(input interface{}) []error {
 			continue
 		}
 
-		rulesArr := strings.Split(rulesTags, "|")
+		rulesArr := strings.Split(rulesTags, "|") 
 
 		for _, ruleValue := range rulesArr {
 			rulesParts := strings.Split(ruleValue, ":")
@@ -253,12 +265,49 @@ func (v *Validator) Validate(input interface{}) []error {
 						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field '%s' should have exactly %d elements", fieldName, ruleVal.(int))))
 					}
 				}
+
+				case string(types.Confirmed) : {
+					//First way is to loop through all fields and check if the confirmation_password exist
+					if !confirmationPasswordInfo.Exist {
+						errors = append(errors, NewValidationError(fieldName, "Confirmation password is required when using confirmed validation. Please provide a confirmation password for this field."))
+						break
+					}
+
+					if(fieldValue != confirmationPasswordInfo.Value) {
+						errors = append(errors, NewValidationError(fieldName, "Confirmation_password and Password fields should match"))
+					}
+				}
 			}
 		}
 
 	}
 	return errors
 }
+
+func checkConfirmationPasswordExists(fields *reflect.Value,done chan<-ConfirmPasswordInfo) {
+	var confirmationPasswordInfo ConfirmPasswordInfo
+
+	for i := 0; i < fields.NumField(); i++ {
+
+		field := fields.Type().Field(i) // the whole field ex: {Title  string validate:"required|max:1" 0 [0] false}
+		confirmationPasswordVal := fields.Field(i).Interface()
+
+		fieldName := field.Name
+
+		if fieldName == "Confirmation_password" {
+	
+			confirmationPasswordInfo = ConfirmPasswordInfo{
+				Exist: true,
+				Value: confirmationPasswordVal.(string),	
+			}
+
+
+			break
+		}
+	}
+	done<-confirmationPasswordInfo
+}
+
 
 func parseRules(ruleParts []string) (string, interface{}) {
 	var ruleValue interface{}
@@ -277,6 +326,7 @@ func parseRules(ruleParts []string) (string, interface{}) {
 	}
 	return ruleName,ruleValue
 }
+
 
 func isValidEmail(email string) bool {
 	emailPattern := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
@@ -382,7 +432,7 @@ func validateAccepted(givenInput interface{}, supportedValues []interface{}) boo
 
 }
 
-func validateSize (givenInput interface{},allowedSize int) bool {
+func validateSize(givenInput interface{},allowedSize int) bool {
 	switch v := givenInput.(type) {
 	case string :
 		return len(v) == allowedSize
