@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	validator "github.com/sCuz12/goinputvalidator/validator"
+	validator "github.com/sCuz12/goinputvalidator"
 )
 type User struct {
 	Title       string `json:"name" validate:"required|max:20|min:2"`
