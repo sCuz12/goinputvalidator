@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sCuz12/goinputvalidator/rules"
 	"github.com/sCuz12/goinputvalidator/types"
 )
 
@@ -30,9 +29,7 @@ type ValidationError struct {
 }
 
 type Validator struct {
-	//ex: title can several rules
-	//ex : [body : [{max 100} {required}]]
-	Rules map[string][]rules.Rule
+
 }
 
 type ConfirmPasswordInfo struct {
@@ -43,7 +40,6 @@ type ConfirmPasswordInfo struct {
 // Returns pointer to Validator Struct
 func New() *Validator {
 	return &Validator{
-		Rules: make(map[string][]rules.Rule),
 	}
 }
 
@@ -59,21 +55,6 @@ func (ve *ValidationError) Error() string {
 	return fmt.Sprintf("Validation error in field '%s': %s", ve.Field, ve.Message)
 }
 
-func (v *Validator) AddRule(field string, rule rules.Rule) {
-	v.Rules[field] = append(v.Rules[field], rule)
-}
-
-// Debug -Testing purposes
-func (v *Validator) DebugRules() {
-	fmt.Println(v.Rules)
-	for field, rules := range v.Rules {
-		fmt.Printf("The field is %v \n", field)
-
-		for _, rule := range rules {
-			fmt.Printf("Rule type %v and rule param %v \n", rule.Type, rule.Param)
-		}
-	}
-}
 
 func (v *Validator) Validate(input interface{}) []error {
 	var errors []error
