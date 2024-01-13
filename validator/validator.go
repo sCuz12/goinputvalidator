@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sCuz12/goinputvalidator/pkg/rules"
+	"github.com/sCuz12/goinputvalidator/rules"
 	"github.com/sCuz12/goinputvalidator/types"
 )
 
@@ -108,7 +108,6 @@ func (v *Validator) Validate(input interface{}) []error {
 			rulesParts := strings.Split(ruleValue, ":")
 
 			var ruleType string = ""
-			var ruleNum int = 0
 		
 			ruleType, ruleVal := parseRules(rulesParts) // get rule type and value ex : max , 100  or email , nil
 
@@ -129,11 +128,10 @@ func (v *Validator) Validate(input interface{}) []error {
 				//min
 				case string(types.Min):
 					{
-						minAssigned := ruleNum
-
-						valueLen := len(fieldValueStr.(string))
-
-						if valueLen < minAssigned {
+						minAssigned := ruleVal
+						valueLen 	:= len(fieldValueStr.(string))
+				
+						if valueLen < minAssigned.(int) {
 							errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field %s is less than the minimum length of %d", fieldName, minAssigned)))
 						}
 					}

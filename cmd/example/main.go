@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/sCuz12/goinputvalidator/pkg/validator"
+	"github.com/sCuz12/goinputvalidator/validator"
 )
 type User struct {
 	Title       string `json:"name" validate:"required|max:20|min:2"`
-	Body        string `validate:"required"`
+	Body        string `validate:"required|min:2"`
 	Email       string `validate:"email|required"`
 	Website     string `validate:"url"`
 	WebsiteURL  string `validate:"active_url"`
@@ -44,7 +44,7 @@ func testValidateSchema() {
 		AllowAge:	12,
 		UserType: "client",
 		SendEmails: 1,
-		Subscription : "asda",
+		Subscription : "paid",
 		Fields: []string{"field1", "field2"},
 	}
 
