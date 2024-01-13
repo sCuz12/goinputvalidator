@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sCuz12/goinputvalidator/types"
+	"github.com/sCuz12/goinputvalidator/v1/types"
 )
 
 /*Allowed Date Format*/
