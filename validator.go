@@ -246,7 +246,7 @@ func (v *Validator) Validate(input interface{}) []error {
 						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Field '%s' should have exactly %d elements", fieldName, ruleVal.(int))))
 					}
 				}
-
+				//Confirmed
 				case string(types.Confirmed) : {
 					//First way is to loop through all fields and check if the confirmation_password exist
 					if !confirmationPasswordInfo.Exist {
@@ -257,6 +257,26 @@ func (v *Validator) Validate(input interface{}) []error {
 					if(fieldValue != confirmationPasswordInfo.Value) {
 						errors = append(errors, NewValidationError(fieldName, "Confirmation_password and Password fields should match"))
 					}
+				}
+				case string(types.Doesnt_end_with) :{
+					suffixchecker := SuffixChecker{}
+
+					canPass := suffixchecker.IsValid(fieldValueStr.(string),ruleVal.(string))
+					
+					if !canPass {
+						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("Input cannot end with value: %s", ruleVal.(string))))
+					}
+				}
+
+				case string(types.Doesnt_start_with) : {
+					prefixchecker := PrefixChecker{}
+					
+					canPass := prefixchecker.IsValid(fieldValueStr.(string),ruleVal.(string))
+
+					if !canPass {
+						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Input cannot start with value : %s", ruleVal.(string))))
+					}
+
 				}
 			}
 		}

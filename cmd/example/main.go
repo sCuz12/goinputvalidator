@@ -22,6 +22,8 @@ type User struct {
 	Fields		[]string `validate:"size:2"`
 	Confirmation_password string 
 	Password 	string `validate:"confirmed"`
+	Smail		string  `validate:"doesnt_end_with:gmail.com"`
+	Surname		string  `validate:"doesnt_start_with:george"`
 }
 
 func main() {
@@ -49,7 +51,9 @@ func testValidateSchema() {
 		Subscription : "paid",
 		Fields: []string{"field1", "field2"},
 		Confirmation_password : "okok1",
-		Password: 	"okok",
+		Password: 	"okok1",
+		Smail: "georgex8@gmail.com",
+		Surname: "george",
 	}
 
 	err := v.Validate(user)
