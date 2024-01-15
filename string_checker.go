@@ -6,6 +6,7 @@ type SuffixChecker struct{}
 
 type PrefixChecker struct{}
 
+type MacaddressChecker struct{}
 
 type StringChecker interface{
 	IsValid(string,substring string)
@@ -22,3 +23,4 @@ func (*SuffixChecker)IsValid (givenString,substring string) bool {
 func (*PrefixChecker)IsValid (givenString,substring string) bool {
 	return !strings.HasPrefix(givenString,substring)
 }
+

@@ -24,6 +24,7 @@ type User struct {
 	Password 	string `validate:"confirmed"`
 	Smail		string  `validate:"doesnt_end_with:gmail.com"`
 	Surname		string  `validate:"doesnt_start_with:george"`
+	MacIP 		string  `validate:"macAddress"`
 }
 
 func main() {
@@ -54,6 +55,7 @@ func testValidateSchema() {
 		Password: 	"okok1",
 		Smail: "georgex8@gmail.com",
 		Surname: "george",
+		MacIP : "00:A0:CC:23:39:3F",
 	}
 
 	err := v.Validate(user)

@@ -47,7 +47,8 @@ type User struct {
    Confirmation_password string 
 	Password 	string `validate:"confirmed"`
    Smail		string  `validate:"doesnt_end_with:gmail.com"`
-	Surname		string  `validate:"doesnt_start_with:george"`
+	Surname		string  `validate:"doesnt_start_with:geo"`
+ 	MacIP 		string  `validate:"macAddress"`
 }
 ```
 
@@ -71,8 +72,9 @@ func main() {
       Fields: []string{"field1", "field2"},
       Confirmation_password : "password",
 	   Password: 	"password1", 
-      Smail: "georgex8@gmail.com",
+      Smail: "georgehadjisavvas12@gmail.com",
 		Surname: "george",
+      MacIP : "00:A0:CC:23:39:3F",
 	}
 
 	err := v.Validate(user)
@@ -158,3 +160,16 @@ func main() {
    - **Rule Format:**  `confirmed`
    - **Example:**  `validate:confirmed`
    - **Description:**  Validates that a field matches its **Confirmation_password** counterpart. For example, it ensures that a **Password** field matches the **Confirmation_password** field to confirm that the user entered the correct password. This rule is  used for password confirmation fields in registration or password reset forms.
+14. **Doesnt End With**
+   - **Rule Format:**  `doesnt_end_with`
+   - **Example:**  `validate:doesnt_end_with:gmail.com`
+   - **Description:**  Validates that a field does not end with a specified string. This rule is commonly used to ensure that a field, such as an email address, does not end with a specific domain or suffix. For example, it can be used to prevent registration with certain email domains. This rule provides an additional layer of validation for fields that should not have specific endings, such as email addresses, to enhance data integrity and security.
+15. **Doesnt Start With**
+   - **Rule Format:**  `doesnt_start_with`
+   - **Example:**  `validate:doesnt_start_with:geo`
+   - **Description:**  alidates that a field does not start with a specified string. This rule is commonly used to ensure that a field does not begin with specific prefixes or patterns. For instance, it can be applied to prevent usernames or passwords from starting with certain characters or sequences
+
+16. **Mac Address format**
+   - **Rule Format:**  `macAddress`
+   - **Example:**  `validate:"macAddress"`
+   - **Description:**  Validates that a field conforms to the standard format of a MAC address. A MAC address is a unique identifier assigned to network interfaces, often represented as six pairs of hexadecimal digits separated by colons or hyphens (e.g., "00:1A:2B:3C:4D:5E"). 

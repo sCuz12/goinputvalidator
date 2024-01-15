@@ -258,6 +258,7 @@ func (v *Validator) Validate(input interface{}) []error {
 						errors = append(errors, NewValidationError(fieldName, "Confirmation_password and Password fields should match"))
 					}
 				}
+					//doesnt END
 				case string(types.Doesnt_end_with) :{
 					suffixchecker := SuffixChecker{}
 
@@ -267,7 +268,7 @@ func (v *Validator) Validate(input interface{}) []error {
 						errors = append(errors, NewValidationError(fieldName,fmt.Sprintf("Input cannot end with value: %s", ruleVal.(string))))
 					}
 				}
-
+				//doesnt START
 				case string(types.Doesnt_start_with) : {
 					prefixchecker := PrefixChecker{}
 					
@@ -277,6 +278,14 @@ func (v *Validator) Validate(input interface{}) []error {
 						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Input cannot start with value : %s", ruleVal.(string))))
 					}
 
+				}
+				//mac address format
+				case string(types.MacAddressFormat) : {
+					isMacFormat := isMacAddressFormat(fieldValueStr.(string))
+
+					if(!isMacFormat) {
+						errors = append(errors, NewValidationError(fieldName, "Invalid MAC address format. The MAC address should have the format 'XX:XX:XX:XX:XX:XX' where X is a hexadecimal digit (0-9, A-F, a-f)."))
+					}
 				}
 			}
 		}
@@ -446,4 +455,13 @@ func validateSize(givenInput interface{},allowedSize int) bool {
 		return false
 
 	}
+}
+
+func isMacAddressFormat(input string) bool {
+	regexPattern := "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
+	//compile the regex
+	regex := regexp.MustCompile(regexPattern)
+
+	//match the input string 
+	return regex.MatchString(input)
 }
