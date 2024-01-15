@@ -49,6 +49,10 @@ type User struct {
    Smail		string  `validate:"doesnt_end_with:gmail.com"`
 	Surname		string  `validate:"doesnt_start_with:geo"`
  	MacIP 		string  `validate:"macAddress"`
+   DriveLicense int 	`validate:"gt:22"`
+	WorkAge		int 	`validate:"lt:65"`
+	YearsOld	int 	`validate:"gte:18"`
+	MinYearsOld	int 	`validate:"lte:18"`
 }
 ```
 
@@ -75,6 +79,10 @@ func main() {
       Smail: "georgehadjisavvas12@gmail.com",
 		Surname: "george",
       MacIP : "00:A0:CC:23:39:3F",
+      DriveLicense: 25,
+		WorkAge: 60,
+		YearsOld: 18,
+		MinYearsOld : 18,
 	}
 
 	err := v.Validate(user)
@@ -173,3 +181,19 @@ func main() {
    - **Rule Format:**  `macAddress`
    - **Example:**  `validate:"macAddress"`
    - **Description:**  Validates that a field conforms to the standard format of a MAC address. A MAC address is a unique identifier assigned to network interfaces, often represented as six pairs of hexadecimal digits separated by colons or hyphens (e.g., "00:1A:2B:3C:4D:5E"). 
+17. **Greater Than** 
+   - **Rule Format:**  `gt:22`
+   - **Example:**  `validate:"gt:22"`
+   - **Description:**  Validates that a field has a value greater than the specified threshold. For example, it can be used to ensure that an age field is greater than 22.
+18. **Greater Than Equal** 
+   - **Rule Format:**  `gte:18`
+   - **Example:**  `validate:"gte:18"`
+   - **Description:** Validates that a field has a value greater than or equal to the specified threshold. For example, it can be used to ensure that a score field is greater than or equal to 18.
+19. **Less Than** 
+   - **Rule Format:**  `lt:65`
+   - **Example:**  `validate:"lt:65"`
+   - **Description:** Validates that a field has a value less than the specified threshold. For example, it can be used to ensure that a temperature field is less than 65.
+20. **Less Than Equal** 
+   - **Rule Format:**  `lte:65`
+   - **Example:**  `validate:"lte:65"`
+   - **Description:** Validates that a field has a value less than or equal to the specified threshold. For example, it can be used to ensure that a price field is less than or equal to 65. 

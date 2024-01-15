@@ -287,6 +287,46 @@ func (v *Validator) Validate(input interface{}) []error {
 						errors = append(errors, NewValidationError(fieldName, "Invalid MAC address format. The MAC address should have the format 'XX:XX:XX:XX:XX:XX' where X is a hexadecimal digit (0-9, A-F, a-f)."))
 					}
 				}
+				//greater than
+				case string(types.GreaterThan) : {
+					comparator := GreaterThanComparator{}
+
+					canPass:= comparator.IsValid(fieldValueStr.(int), ruleVal.(int))
+
+					if(!canPass) {
+						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Invalid value. The value must be greater than the specified threshold which is : %v",ruleVal)))
+					}
+				}
+				//less than 
+				case string(types.LessThan) : {
+
+					comparator := LessThanComparator{}
+
+					canPass := comparator.IsValid(fieldValueStr.(int),ruleVal.(int))
+
+					if !canPass {
+						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Invalid value. The value must be less than the specified floor  which is : %v",ruleVal)))
+					}
+				}
+				//Greater equal than
+				case string(types.GreaterEqualThan) : {
+					comparator := GreaterEqualThanComparator{}
+
+					canPass := comparator.IsValid(fieldValueStr.(int), ruleVal.(int))
+					if !canPass {
+						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Invalid value. The value must be greater OR equal than the specified threshold floor  which is : %v",ruleVal)))
+					}
+				}
+				case string(types.LessThanEqual) : {
+					comparator := LessThanEqualComparator{}
+
+					canPass := comparator.IsValid(fieldValueStr.(int),ruleVal.(int))
+
+					if !canPass {
+						errors = append(errors, NewValidationError(fieldName, fmt.Sprintf("Invalid value. The value must be less OR equal than the specified floor  which is : %v",ruleVal)))
+					}
+
+				}
 			}
 		}
 

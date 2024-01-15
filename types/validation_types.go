@@ -8,7 +8,7 @@ const (
 	Max ValidationTypeRule 		 	     = "max"
 	Min ValidationTypeRule 		  	     = "min"
 	Email ValidationTypeRule 	  	     = "email"
-	Url ValidationTypeRule	      	       = "url"
+	Url ValidationTypeRule	      	     = "url"
 	ActiveUrl ValidationTypeRule  	     = "active_url"
 	IpFormat ValidationTypeRule   	     = "ipformat"
 	Date	ValidationTypeRule    	     = "date"
@@ -22,4 +22,8 @@ const (
 	Doesnt_end_with ValidationTypeRule   = "doesnt_end_with"
 	Doesnt_start_with ValidationTypeRule = "doesnt_start_with"
 	MacAddressFormat ValidationTypeRule	 = "macAddress"
+	GreaterThan		ValidationTypeRule   = "gt"
+	LessThan ValidationTypeRule 		 = "lt"
+	GreaterEqualThan ValidationTypeRule  = "gte"
+	LessThanEqual ValidationTypeRule     = "lte"
 )

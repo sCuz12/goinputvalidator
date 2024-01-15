@@ -22,9 +22,13 @@ type User struct {
 	Fields		[]string `validate:"size:2"`
 	Confirmation_password string 
 	Password 	string `validate:"confirmed"`
-	Smail		string  `validate:"doesnt_end_with:gmail.com"`
-	Surname		string  `validate:"doesnt_start_with:george"`
+	Smail		string  `validate:"doesnt_end_with:example.com"`
+	Surname		string  `validate:"doesnt_start_with:gio"`
 	MacIP 		string  `validate:"macAddress"`
+	DriveLicense int 	`validate:"gt:22"`
+	WorkAge		int 	`validate:"lt:65"`
+	YearsOld	int 	`validate:"gte:18"`
+	MinYearsOld	int 	`validate:"lte:18"`
 }
 
 func main() {
@@ -56,6 +60,10 @@ func testValidateSchema() {
 		Smail: "georgex8@gmail.com",
 		Surname: "george",
 		MacIP : "00:A0:CC:23:39:3F",
+		DriveLicense: 25,
+		WorkAge: 60,
+		YearsOld: 18,
+		MinYearsOld : 18,
 	}
 
 	err := v.Validate(user)
